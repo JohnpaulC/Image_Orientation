@@ -4,6 +4,7 @@ import time
 
 print(cv.__version__)
 
+
 def angleCal(img_base, img_rotate):
     start = time.time()
     # Sift Create and calculate
@@ -16,7 +17,7 @@ def angleCal(img_base, img_rotate):
 
     bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
     matches = bf.match(des1, des2)
-    matches = sorted(matches, key = lambda x: x.distance)
+    matches = sorted(matches, key=lambda x: x.distance)
 
     if False:
         img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:1], None, flags=2)
@@ -60,7 +61,6 @@ def angleCal(img_base, img_rotate):
     return mean
 
 
-
 Image_chosen = 0
 if Image_chosen == 0:
     img_base = cv.imread('dog.jpg', cv.IMREAD_COLOR)
@@ -85,7 +85,6 @@ else:
     img_base = cv.imread("./1.jpeg", cv.IMREAD_COLOR)
     img_rotate = cv.imread("./2.jpeg", cv.IMREAD_COLOR)
 
-
 img_base = cv.cvtColor(img_base, cv.COLOR_BGR2GRAY)
 img_rotate = cv.cvtColor(img_rotate, cv.COLOR_BGR2GRAY)
 if False:
@@ -96,7 +95,6 @@ if False:
     print(img_base.shape)
     print(img_rotate.shape)
 
-s
 angleCal(img_base, img_rotate)
 print("-" * 20)
 
@@ -105,6 +103,6 @@ h_start = 200
 h_end = 575
 w_start = 200
 w_end = 766
-img_rotate = img_rotate[h_start : h_end, w_start : w_end, ...]
+img_rotate = img_rotate[h_start: h_end, w_start: w_end, ...]
 print(img_rotate.shape)
 angleCal(img_base, img_rotate)
