@@ -103,5 +103,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 .idea/
+.idea/inspectionProfiles/profiles_settings.xml
 *.ipynb
 *.jpg
