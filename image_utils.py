@@ -14,9 +14,9 @@ def creat_images():
     bottom_y = 400
 
     img_orig = cv.imread('dog.jpg', cv.IMREAD_COLOR)
-    print(img_orig.shape)
     (h, w) = img_orig.shape[:2]
-    print("The image size is {0:d} * {1:d}".format(h, w))
+    # print(img_orig.shape)
+    #print("The image size is {0:d} * {1:d}".format(h, w))
     img_gray = cv.cvtColor(img_orig, cv.COLOR_BGR2GRAY)
     plt.subplot(3, 2, 1), plt.imshow(img_gray, cmap='Greys_r'), plt.title("gray image")
 
@@ -24,7 +24,7 @@ def creat_images():
     angle = 5
     M = cv.getRotationMatrix2D(center, angle, 1)
     img_rotate = cv.warpAffine(img_gray, M, (w, h))
-    print(img_rotate.shape)
+    #print(img_rotate.shape)
     plt.subplot(3, 2, 2), plt.imshow(img_rotate, cmap='Greys_r'), plt.title("rotate image")
 
     # Do the translation
@@ -38,9 +38,7 @@ def creat_images():
     pts1 = np.float32([[0, 0], [w, 0], [0, h], [h, w]])
     pts2 = np.float32([[0, 50], [w, 0], [0, h - 100], [h, w]])
     M = cv.getPerspectiveTransform(pts1, pts2)
-    print(M)
-
-    img_perspective = cv.warpPerspective(img_gray, M, (w, h))
+    img_perspective = cv.warpPerspective(img_rotate, M, (w, h))
     plt.subplot(3, 2, 4), plt.imshow(img_perspective, cmap='Greys_r'), plt.title("Perceptive image")
 
     result_orig = img_gray[top_y:bottom_y, top_x:bottom_x]
@@ -75,8 +73,12 @@ def angleCal(img_base, img_rotate):
     matches = sorted(matches, key=lambda x: x.distance)
 
     if False:
-        img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:1], None, flags=2)
-        cv.imwrite('oh.jpg', img)
+        img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:10], None, flags=2)
+        cv.imshow('match', img)
+        cv.waitKey()
+        cv.destroyWindow('match')
+
+    if False:
         plt.imshow(img), plt.show()
         print(type(matches))
         print(len(matches))
