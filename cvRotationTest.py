@@ -15,4 +15,4 @@ mean_perspective = angleCal(result_orig, result_perspective)
 print("Mean between perspective is {0:f}".format(mean_perspective))
 
 mean_correction = angleCal(result_orig, result_correction)
-print("Mean between perspective is {0:f}".format(mean_perspective))
+print("Mean between perspective is {0:f}".format(mean_correction))
