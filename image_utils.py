@@ -10,10 +10,10 @@ def creat_images():
     # Change one image and getting from.
     top_x = 100
     top_y = 100
-    bottom_x = 600
+    bottom_x = 500
     bottom_y = 400
 
-    img_orig = cv.imread('dog.jpg', cv.IMREAD_COLOR)
+    img_orig = cv.imread('office.jpg', cv.IMREAD_COLOR)
     (h, w) = img_orig.shape[:2]
     #print("The image size is {0:d} * {1:d}".format(h, w))
     img_gray = cv.cvtColor(img_orig, cv.COLOR_BGR2GRAY)
@@ -33,15 +33,18 @@ def creat_images():
 
 
     ### Do the perspective on Original Image
+    num_distortion = 50
     pts1 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
-    pts2 = np.float32([[0, 50], [w, 0], [0, h - 50], [w, h]])
-    M = cv.getPerspectiveTransform(pts1, pts2)
-    img_perspective = cv.warpPerspective(img_gray, M, (w, h))
+    pts2 = np.float32([[0, num_distortion], [w, 0], [0, h - num_distortion], [w, h]])
+    M_p = cv.getPerspectiveTransform(pts1, pts2)
+    img_perspective = cv.warpPerspective(img_gray, M_p, (w, h))
 
-    pts1 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
-    pts2 = np.float32([[0, 50], [w, 0], [0, h - 50], [w, h]])
-    M = cv.getPerspectiveTransform(pts2, pts1)
-    img_correction = cv.warpPerspective(img_perspective, M, (w, h))
+    M_n = cv.getPerspectiveTransform(pts2, pts1)
+    img_correction = cv.warpPerspective(img_perspective, M_n, (w, h))
+
+    img_rotation_per = cv.warpPerspective(img_rotate, M_p, (w, h))
+    img_rotation_per_cor = cv.warpPerspective(img_rotation_per, M_n, (w, h))
+
 
 
     ### Get the slice of whole image
@@ -50,13 +53,17 @@ def creat_images():
     result_rotate_translation = img_rotate_translation[top_y:bottom_y, top_x:bottom_x]
     result_perspective = img_perspective[top_y:bottom_y, top_x:bottom_x]
     result_correction = img_correction[top_y:bottom_y, top_x:bottom_x]
+    result_rotation_per = img_rotation_per[top_y:bottom_y, top_x:bottom_x]
+    result_rotation_per_cor = img_rotation_per_cor[top_y:bottom_y, top_x:bottom_x]
+
+
     # DEBUG: Image show
-    if False:
+    if True:
         cv.imshow("result_orig", result_orig)
         cv.imshow("result_rotate", result_rotate)
         cv.imshow("result_rotate_translation", result_rotate_translation)
-        cv.imshow("result_perspective", img_perspective)
-        cv.imshow("result_correction", img_correction)
+        cv.imshow("result_perspective", result_perspective)
+        cv.imshow("result_correction", result_correction)
 
         cv.waitKey(0)
         cv.destroyAllWindows()
@@ -68,7 +75,9 @@ def creat_images():
         plt.subplot(3, 2, 4), plt.imshow(img_perspective, cmap='Greys_r'), plt.title("Perceptive image")
         plt.show()
 
-    return result_orig, result_rotate, result_rotate_translation, result_perspective, result_correction
+    return result_orig, result_rotate, result_rotate_translation,\
+           result_perspective, result_correction,\
+           result_rotation_per, result_rotation_per_cor
 
 
 def angleCal(img_base, img_rotate, show_all_results = False):
@@ -85,7 +94,7 @@ def angleCal(img_base, img_rotate, show_all_results = False):
     matches = bf.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
 
-    if False:
+    if show_all_results:
         img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:10], None, flags=2)
         cv.imshow('match', img)
         cv.waitKey()
@@ -103,6 +112,8 @@ def angleCal(img_base, img_rotate, show_all_results = False):
         num = i
         img_index1 = matches[num].queryIdx
         img_index2 = matches[num].trainIdx
+        rotate_angle.append(kp1[img_index1].angle - kp2[img_index2].angle)
+
         if False:
             print("-" * 20)
             print(matches[num])
@@ -114,19 +125,19 @@ def angleCal(img_base, img_rotate, show_all_results = False):
             print(kp1[img_index1].angle)
             print(kp2[img_index2].pt)
             print(kp2[img_index2].angle)
-        rotate_angle.append(kp1[img_index1].angle - kp2[img_index2].angle)
+
     end_time = time.time() - start
     print("Total time: " + str(end_time))
 
     rotate_angle = np.array(rotate_angle)
     rotate_angle = (360 * (rotate_angle < 0) + rotate_angle)
     rotate_angle = np.abs((rotate_angle > 359) * 360 - rotate_angle)
+    mean = np.mean(rotate_angle)
+
     if show_all_results:
         print("Final result: ")
         print(rotate_angle)
-
-    mean = np.mean(rotate_angle)
-    print("Mean result: ")
-    print(mean)
+        print("Mean result: ")
+        print(mean)
 
     return mean
