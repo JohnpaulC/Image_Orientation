@@ -15,55 +15,68 @@ def creat_images():
 
     img_orig = cv.imread('dog.jpg', cv.IMREAD_COLOR)
     (h, w) = img_orig.shape[:2]
-    # print(img_orig.shape)
     #print("The image size is {0:d} * {1:d}".format(h, w))
     img_gray = cv.cvtColor(img_orig, cv.COLOR_BGR2GRAY)
-    plt.subplot(3, 2, 1), plt.imshow(img_gray, cmap='Greys_r'), plt.title("gray image")
+
 
     center = (w / 2, h / 2)
     angle = 5
     M = cv.getRotationMatrix2D(center, angle, 1)
     img_rotate = cv.warpAffine(img_gray, M, (w, h))
-    #print(img_rotate.shape)
-    plt.subplot(3, 2, 2), plt.imshow(img_rotate, cmap='Greys_r'), plt.title("rotate image")
 
-    # Do the translation
+    # Do the translation on rotated image
     x_translation, y_translation = 20, 20
     T = np.float32([
         [1, 0, x_translation],
         [0, 1, y_translation]])
     img_rotate_translation = cv.warpAffine(img_rotate, T, (w, h))
-    plt.subplot(3, 2, 3), plt.imshow(img_rotate_translation, cmap='Greys_r'), plt.title("Translate rotate image")
 
-    pts1 = np.float32([[0, 0], [w, 0], [0, h], [h, w]])
-    pts2 = np.float32([[0, 50], [w, 0], [0, h - 100], [h, w]])
+
+    ### Do the perspective on Original Image
+    pts1 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
+    pts2 = np.float32([[0, 50], [w, 0], [0, h - 50], [w, h]])
     M = cv.getPerspectiveTransform(pts1, pts2)
-    img_perspective = cv.warpPerspective(img_rotate, M, (w, h))
-    plt.subplot(3, 2, 4), plt.imshow(img_perspective, cmap='Greys_r'), plt.title("Perceptive image")
+    img_perspective = cv.warpPerspective(img_gray, M, (w, h))
 
+    pts1 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
+    pts2 = np.float32([[0, 50], [w, 0], [0, h - 50], [w, h]])
+    M = cv.getPerspectiveTransform(pts2, pts1)
+    img_correction = cv.warpPerspective(img_perspective, M, (w, h))
+
+
+    ### Get the slice of whole image
     result_orig = img_gray[top_y:bottom_y, top_x:bottom_x]
     result_rotate = img_rotate[top_y:bottom_y, top_x:bottom_x]
     result_rotate_translation = img_rotate_translation[top_y:bottom_y, top_x:bottom_x]
     result_perspective = img_perspective[top_y:bottom_y, top_x:bottom_x]
+    result_correction = img_correction[top_y:bottom_y, top_x:bottom_x]
+    # DEBUG: Image show
     if False:
-        cv.imshow("1", result_orig)
-        cv.imshow("2", result_rotate)
-        cv.imshow("3", result_rotate_translation)
-        cv.imshow("123", result_perspective)
+        cv.imshow("result_orig", result_orig)
+        cv.imshow("result_rotate", result_rotate)
+        cv.imshow("result_rotate_translation", result_rotate_translation)
+        cv.imshow("result_perspective", img_perspective)
+        cv.imshow("result_correction", img_correction)
 
-        plt.show()
         cv.waitKey(0)
         cv.destroyAllWindows()
 
-    return result_orig, result_rotate, result_rotate_translation, result_perspective
+    elif False:
+        plt.subplot(3, 2, 1), plt.imshow(img_gray, cmap='Greys_r'), plt.title("gray image")
+        plt.subplot(3, 2, 2), plt.imshow(img_rotate, cmap='Greys_r'), plt.title("rotate image")
+        plt.subplot(3, 2, 3), plt.imshow(img_rotate_translation, cmap='Greys_r'), plt.title("Translate rotate image")
+        plt.subplot(3, 2, 4), plt.imshow(img_perspective, cmap='Greys_r'), plt.title("Perceptive image")
+        plt.show()
+
+    return result_orig, result_rotate, result_rotate_translation, result_perspective, result_correction
 
 
-def angleCal(img_base, img_rotate):
+def angleCal(img_base, img_rotate, show_all_results = False):
     start = time.time()
     # Sift Create and calculate
     sift = cv.xfeatures2d.SIFT_create()
     # Kp is key points
-    # des is descriptor
+    # des is feature descriptor
     # len(des) = len(Kp) * 128
     kp1, des1 = sift.detectAndCompute(img_base, None)
     kp2, des2 = sift.detectAndCompute(img_rotate, None)
@@ -85,7 +98,7 @@ def angleCal(img_base, img_rotate):
         print(type(matches[1]))
 
     rotate_angle = []
-    num_keypoint = 20
+    num_keypoint = 10
     for i in range(num_keypoint):
         num = i
         img_index1 = matches[num].queryIdx
@@ -107,7 +120,8 @@ def angleCal(img_base, img_rotate):
 
     rotate_angle = np.array(rotate_angle)
     rotate_angle = (360 * (rotate_angle < 0) + rotate_angle)
-    if False:
+    rotate_angle = np.abs((rotate_angle > 359) * 360 - rotate_angle)
+    if show_all_results:
         print("Final result: ")
         print(rotate_angle)
 
