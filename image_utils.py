@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 print(cv.__version__)
 
 
-def creat_images():
+def creat_images(angle):
     # Change one image and getting from.
     top_x = 100
     top_y = 100
@@ -20,7 +20,6 @@ def creat_images():
 
 
     center = (w / 2, h / 2)
-    angle = 5
     M = cv.getRotationMatrix2D(center, angle, 1)
     img_rotate = cv.warpAffine(img_gray, M, (w, h))
 
@@ -45,8 +44,6 @@ def creat_images():
     img_rotation_per = cv.warpPerspective(img_rotate, M_p, (w, h))
     img_rotation_per_cor = cv.warpPerspective(img_rotation_per, M_n, (w, h))
 
-
-
     ### Get the slice of whole image
     result_orig = img_gray[top_y:bottom_y, top_x:bottom_x]
     result_rotate = img_rotate[top_y:bottom_y, top_x:bottom_x]
@@ -58,7 +55,7 @@ def creat_images():
 
 
     # DEBUG: Image show
-    if True:
+    if False:
         cv.imshow("result_orig", result_orig)
         cv.imshow("result_rotate", result_rotate)
         cv.imshow("result_rotate_translation", result_rotate_translation)
@@ -68,11 +65,15 @@ def creat_images():
         cv.waitKey(0)
         cv.destroyAllWindows()
 
-    elif False:
-        plt.subplot(3, 2, 1), plt.imshow(img_gray, cmap='Greys_r'), plt.title("gray image")
-        plt.subplot(3, 2, 2), plt.imshow(img_rotate, cmap='Greys_r'), plt.title("rotate image")
-        plt.subplot(3, 2, 3), plt.imshow(img_rotate_translation, cmap='Greys_r'), plt.title("Translate rotate image")
-        plt.subplot(3, 2, 4), plt.imshow(img_perspective, cmap='Greys_r'), plt.title("Perceptive image")
+    elif True:
+        plt.subplot(3, 2, 1), plt.axis('off'), plt.imshow(img_gray, cmap='Greys_r'), plt.title("gray image")
+        plt.subplot(3, 2, 2), plt.axis('off'), plt.imshow(img_rotate, cmap='Greys_r'), plt.title("rotate image")
+
+        plt.subplot(3, 2, 3), plt.axis('off'), plt.imshow(img_perspective, cmap='Greys_r'), plt.title("Perceptive image")
+        plt.subplot(3, 2, 4), plt.axis('off'), plt.imshow(img_correction, cmap='Greys_r'), plt.title("Correction image")
+
+        plt.subplot(3, 2, 5), plt.axis('off'), plt.imshow(img_rotation_per, cmap='Greys_r'), plt.title("Rotate Perceptive image")
+        plt.subplot(3, 2, 6), plt.axis('off'), plt.imshow(img_rotation_per_cor, cmap='Greys_r'), plt.title("Rotate Correction image")
         plt.show()
 
     return result_orig, result_rotate, result_rotate_translation,\
@@ -141,3 +142,21 @@ def angleCal(img_base, img_rotate, show_all_results = False):
         print(mean)
 
     return mean
+
+def plot_result(y, constant = None):
+    x = np.arange(0, len(y))
+    y = np.array(y)
+    plt.figure()
+    if constant is not None:
+        plt.plot(x, 0 * x + constant)
+    plt.plot(x, y)
+    plt.show()
+
+def plot_result_bar(y, constant = None):
+    x = np.arange(0, len(y))
+    y = np.array(y)
+    plt.figure()
+    if constant is not None:
+        plt.plot(x, 0 * x + constant)
+    plt.plot(x, y)
+    plt.show()

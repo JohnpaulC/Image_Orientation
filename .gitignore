@@ -106,3 +106,4 @@ venv.bak/
 .idea/inspectionProfiles/profiles_settings.xml
 *.ipynb
 *.jpg
+.DS_Store
