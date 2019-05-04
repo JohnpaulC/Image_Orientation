@@ -1,50 +1,33 @@
-from image_utils import angleCal, create_images
-import matplotlib.pyplot as plt
+from image_utils import angleCal, create_images, plot_result_bar
 
 rotate_angle = 10
 
 result_orig, result_rotate, result_rotate_translation,\
-result_perspective, result_correction,\
-result_rotation_per, result_rotation_per_cor= create_images(rotate_angle)
+result_perspective, result_correction = create_images(rotate_angle)
 
 name_result = []
 result = []
 
-print("Simple Rotation:")
-mean_rotate = angleCal(result_orig, result_rotate)
-result.append(mean_rotate)
-name_result.append("Rotate")
-print("Mean between rotate is {0:f}".format(mean_rotate))
-print("Simple Rotation and Translation:")
-mean_rotate_translation = angleCal(result_orig, result_rotate_translation)
-result.append(mean_rotate_translation)
-name_result.append("Trans+Rotate")
-print("Mean between rotate and translation is {0:f}".format(mean_rotate_translation))
+# Rotate
+mean_rotate, time = angleCal(result_orig, result_rotate)
+result.append(mean_rotate), name_result.append("Rotate")
+print("Rotate: {0:6.3f} in {1:.3f}".format(mean_rotate, time))
 
-print("Simple Perspective:")
-mean_perspective = angleCal(result_orig, result_perspective)
-result.append(mean_perspective)
-name_result.append("Perspective")
-print("Mean between perspective is {0:f}".format(mean_perspective))
-print("Correction From Perspective:")
-mean_correction = angleCal(result_orig, result_correction)
-result.append(mean_correction)
-name_result.append("Correction")
-print("Mean between perspective is {0:f}".format(mean_correction))
+# Rotate and Translation
+mean_rotate_translation, time = angleCal(result_orig, result_rotate_translation)
+result.append(mean_rotate_translation), name_result.append("Trans+Rotate")
+print("Rotate and translation: {0:6.3f} in {1:.3f}".format(mean_rotate_translation, time))
 
-print("Rotation Perspective:")
-mean_rot_perspective = angleCal(result_orig, result_rotation_per)
-result.append(mean_rot_perspective)
-name_result.append("RPerspective")
-print("Mean between perspective is {0:f}".format(mean_rot_perspective))
-print("Rotation Correction From Perspective:")
-mean_rot_correction = angleCal(result_orig, result_rotation_per_cor)
-result.append(mean_rot_correction)
-name_result.append("RCorrection")
-print("Mean between perspective is {0:f}".format(mean_rot_correction))
+# Perspective
+mean_perspective, time = angleCal(result_orig, result_perspective)
+result.append(mean_perspective), name_result.append("Perspective")
+print("Perspective: {0:6.3f} in {1:.3f}".format(mean_perspective, time))
 
-plt.figure()
-plt.bar(name_result, result)
-plt.show()
+# Correction
+mean_correction, time = angleCal(result_orig, result_correction)
+result.append(mean_correction), name_result.append("Correction")
+print("Correction: {0:6.3f} in {1:.3f}".format(mean_correction, time))
+
+plot_result_bar(name_result, result, rotate_angle)
 
 

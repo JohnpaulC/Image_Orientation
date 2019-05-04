@@ -18,7 +18,6 @@ def create_images(angle):
     #print("The image size is {0:d} * {1:d}".format(h, w))
     img_gray = cv.cvtColor(img_orig, cv.COLOR_BGR2GRAY)
 
-
     center = (w / 2, h / 2)
     M = cv.getRotationMatrix2D(center, angle, 1)
     img_rotate = cv.warpAffine(img_gray, M, (w, h))
@@ -36,13 +35,10 @@ def create_images(angle):
     pts1 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
     pts2 = np.float32([[0, num_distortion], [w, 0], [0, h - num_distortion], [w, h]])
     M_p = cv.getPerspectiveTransform(pts1, pts2)
-    img_perspective = cv.warpPerspective(img_gray, M_p, (w, h))
+    img_perspective = cv.warpPerspective(img_rotate, M_p, (w, h))
 
     M_n = cv.getPerspectiveTransform(pts2, pts1)
     img_correction = cv.warpPerspective(img_perspective, M_n, (w, h))
-
-    img_rotation_per = cv.warpPerspective(img_rotate, M_p, (w, h))
-    img_rotation_per_cor = cv.warpPerspective(img_rotation_per, M_n, (w, h))
 
     ### Get the slice of whole image
     result_orig = img_gray[top_y:bottom_y, top_x:bottom_x]
@@ -50,8 +46,6 @@ def create_images(angle):
     result_rotate_translation = img_rotate_translation[top_y:bottom_y, top_x:bottom_x]
     result_perspective = img_perspective[top_y:bottom_y, top_x:bottom_x]
     result_correction = img_correction[top_y:bottom_y, top_x:bottom_x]
-    result_rotation_per = img_rotation_per[top_y:bottom_y, top_x:bottom_x]
-    result_rotation_per_cor = img_rotation_per_cor[top_y:bottom_y, top_x:bottom_x]
 
 
     # DEBUG: Image show
@@ -66,19 +60,15 @@ def create_images(angle):
         cv.destroyAllWindows()
 
     elif True:
-        plt.subplot(3, 2, 1), plt.axis('off'), plt.imshow(img_gray, cmap='Greys_r'), plt.title("gray image")
-        plt.subplot(3, 2, 2), plt.axis('off'), plt.imshow(img_rotate, cmap='Greys_r'), plt.title("rotate image")
+        plt.subplot(2, 2, 1), plt.axis('off'), plt.imshow(img_gray, cmap='Greys_r'), plt.title("gray image")
+        plt.subplot(2, 2, 2), plt.axis('off'), plt.imshow(img_rotate, cmap='Greys_r'), plt.title("rotate image")
 
-        plt.subplot(3, 2, 3), plt.axis('off'), plt.imshow(img_perspective, cmap='Greys_r'), plt.title("Perceptive image")
-        plt.subplot(3, 2, 4), plt.axis('off'), plt.imshow(img_correction, cmap='Greys_r'), plt.title("Correction image")
-
-        plt.subplot(3, 2, 5), plt.axis('off'), plt.imshow(img_rotation_per, cmap='Greys_r'), plt.title("Rotate Perceptive image")
-        plt.subplot(3, 2, 6), plt.axis('off'), plt.imshow(img_rotation_per_cor, cmap='Greys_r'), plt.title("Rotate Correction image")
+        plt.subplot(2, 2, 3), plt.axis('off'), plt.imshow(img_perspective, cmap='Greys_r'), plt.title("Perceptive image")
+        plt.subplot(2, 2, 4), plt.axis('off'), plt.imshow(img_correction, cmap='Greys_r'), plt.title("Correction image")
         plt.show()
 
     return result_orig, result_rotate, result_rotate_translation,\
-           result_perspective, result_correction,\
-           result_rotation_per, result_rotation_per_cor
+           result_perspective, result_correction
 
 
 def angleCal(img_base, img_rotate, show_all_results = False):
@@ -100,12 +90,10 @@ def angleCal(img_base, img_rotate, show_all_results = False):
         cv.imshow('match', img)
         cv.waitKey()
         cv.destroyWindow('match')
-
-    if False:
-        plt.imshow(img), plt.show()
-        print(type(matches))
-        print(len(matches))
-        print(type(matches[1]))
+        if False:
+            plt.imshow(img), plt.show()
+            print(type(matches)), print(len(matches))
+            print(type(matches[1]))
 
     rotate_angle = []
     num_keypoint = 10
@@ -114,25 +102,19 @@ def angleCal(img_base, img_rotate, show_all_results = False):
         img_index1 = matches[num].queryIdx
         img_index2 = matches[num].trainIdx
         rotate_angle.append(kp1[img_index1].angle - kp2[img_index2].angle)
-
         if False:
             print("-" * 20)
-            print(matches[num])
-            print(matches[num].distance)
-            print(matches[num].imgIdx)
-            print(matches[num].queryIdx)
-            print(matches[num].trainIdx)
-            print(kp1[img_index1].pt)
-            print(kp1[img_index1].angle)
-            print(kp2[img_index2].pt)
-            print(kp2[img_index2].angle)
+            print(matches[num].distance), print(matches[num].imgIdx)
+            print(matches[num].queryIdx), print(matches[num].trainIdx)
+            print(kp1[img_index1].pt), print(kp1[img_index1].angle)
+            print(kp2[img_index2].pt), print(kp2[img_index2].angle)
 
     end_time = time.time() - start
-    print("Total time: " + str(end_time))
+    #print("Total time: " + str(end_time))
 
     rotate_angle = np.array(rotate_angle)
     rotate_angle = (360 * (rotate_angle < 0) + rotate_angle)
-    rotate_angle = np.abs((rotate_angle > 359) * 360 - rotate_angle)
+    rotate_angle = np.abs((rotate_angle > 358) * 360 - rotate_angle)
     mean = np.mean(rotate_angle)
 
     if show_all_results:
@@ -141,22 +123,14 @@ def angleCal(img_base, img_rotate, show_all_results = False):
         print("Mean result: ")
         print(mean)
 
-    return mean
+    return mean, end_time
 
-def plot_result(y, constant = None):
-    x = np.arange(0, len(y))
-    y = np.array(y)
+def plot_result_bar(name_result, result, base_value = None):
     plt.figure()
-    if constant is not None:
-        plt.plot(x, 0 * x + constant)
-    plt.plot(x, y)
-    plt.show()
-
-def plot_result_bar(y, constant = None):
-    x = np.arange(0, len(y))
-    y = np.array(y)
-    plt.figure()
-    if constant is not None:
-        plt.plot(x, 0 * x + constant)
-    plt.plot(x, y)
+    plt.bar(name_result, result, width=0.25)
+    if base_value is not None:
+        plt.plot(name_result, len(name_result) * [base_value], 'r--', linewidth=0.5)
+        plt.title("Result" + str(base_value))
+    for x, y in zip(name_result, result):
+        plt.text(x, y, '%.2f' % y, ha='center', va='bottom')
     plt.show()
