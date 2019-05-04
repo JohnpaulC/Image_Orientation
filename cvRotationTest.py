@@ -1,10 +1,11 @@
-from image_utils import angleCal, creat_images
+from image_utils import angleCal, create_images
 import matplotlib.pyplot as plt
 
+rotate_angle = 10
 
 result_orig, result_rotate, result_rotate_translation,\
 result_perspective, result_correction,\
-result_rotation_per, result_rotation_per_cor= creat_images()
+result_rotation_per, result_rotation_per_cor= create_images(rotate_angle)
 
 name_result = []
 result = []

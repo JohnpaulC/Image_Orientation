@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 print(cv.__version__)
 
 
-def creat_images(angle):
+def create_images(angle):
     # Change one image and getting from.
     top_x = 100
     top_y = 100
