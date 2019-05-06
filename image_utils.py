@@ -71,30 +71,46 @@ def create_images(angle):
            result_perspective, result_correction
 
 
-def angleCal(img_base, img_rotate, show_all_results = False):
+def angleCal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     start = time.time()
-    # Sift Create and calculate
-    sift = cv.xfeatures2d.SIFT_create()
-    # Kp is key points
-    # des is feature descriptor
-    # len(des) = len(Kp) * 128
-    kp1, des1 = sift.detectAndCompute(img_base, None)
-    kp2, des2 = sift.detectAndCompute(img_rotate, None)
 
-    bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
+    if mode == "SIFT":
+        # Sift Create and calculate
+        sift = cv.xfeatures2d.SIFT_create()
+        # Kp is key points
+        # des is feature descriptor
+        # len(des) = len(Kp) * 128
+        kp1, des1 = sift.detectAndCompute(img_base, None)
+        kp2, des2 = sift.detectAndCompute(img_rotate, None)
+
+        bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
+    elif mode == "ORB":
+        orb = cv.ORB_create()
+
+        kp1, des1 = orb.detectAndCompute(img_base, None)
+        kp2, des2 = orb.detectAndCompute(img_rotate, None)
+
+        # create BFMatcher object
+        bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
+    else:
+        surf = cv.xfeatures2d.SURF_create()
+        kp1, des1 = surf.detectAndCompute(img_base, None)
+        kp2, des2 = surf.detectAndCompute(img_rotate, None)
+
+        # create BFMatcher object
+        bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
     matches = bf.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
 
     if show_all_results:
         img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:10], None, flags=2)
-        cv.imshow('match', img)
-        cv.waitKey()
-        cv.destroyWindow('match')
+        cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
         if False:
             plt.imshow(img), plt.show()
             print(type(matches)), print(len(matches))
             print(type(matches[1]))
 
+    # Cal the Orientation
     rotate_angle = []
     num_keypoint = 10
     for i in range(num_keypoint):
@@ -112,6 +128,7 @@ def angleCal(img_base, img_rotate, show_all_results = False):
     end_time = time.time() - start
     #print("Total time: " + str(end_time))
 
+    # Change the local
     rotate_angle = np.array(rotate_angle)
     rotate_angle = (360 * (rotate_angle < 0) + rotate_angle)
     rotate_angle = np.abs((rotate_angle > 358) * 360 - rotate_angle)
