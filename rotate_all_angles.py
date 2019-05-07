@@ -1,38 +1,41 @@
-from image_utils import angleCal, create_images, plot_result
+from image_utils import angleCal, create_images, plot_double_result
 
 rotate_angle = 10
 mode_list = ["SIFT", "SURF", "ORB"]
-sift_result = []
+sift_result_p = []
+sift_result_c = []
+surf_result_p = []
+surf_result_c = []
+orb_result_p = []
+orb_result_c = []
 
 for mode in mode_list:
-    surf_result = []
-    orb_result = []
-    name_result = []
-    result = []
-    for rotate_angle in range(20):
-        result_orig, result_rotate, result_rotate_translation, \
-        result_perspective, result_correction = create_images(rotate_angle)
+    result_perspective = []
+    result_correction = []
+    for rotate_angle in range(45):
+        img_orig, _, _, img_perspective, img_correction = create_images(rotate_angle)
         # For Different Feature Descriptor
-
-        print("-----The Descriptor {0:s} is using-----".format(mode))
-        # Rotate
-        mean_rotate, time = angleCal(result_orig, result_rotate, mode)
-        sift_result.append(mean_rotate - rotate_angle)
-        print("Rotate: {0:6.3f} in {1:.3f}".format(mean_rotate, time))
-
-        # Rotate and Translation
-        mean_rotate_translation, time = angleCal(result_orig, result_rotate_translation, mode)
-        sift_result.append(mean_rotate - rotate_angle)
-        print("Rotate and translation: {0:6.3f} in {1:.3f}".format(mean_rotate_translation, time))
-
         # Perspective
-        mean_perspective, time = angleCal(result_orig, result_perspective, mode)
-        sift_result.append(mean_rotate - rotate_angle)
+        mean_perspective, time = angleCal(img_orig, img_perspective, mode)
+        result_perspective.append(abs(mean_perspective - rotate_angle))
         print("Perspective: {0:6.3f} in {1:.3f}".format(mean_perspective, time))
 
         # Correction
-        mean_correction, time = angleCal(result_orig, result_correction, mode)
-        result.append(mean_correction), name_result.append(mode + " C")
+        mean_correction, time = angleCal(img_orig, img_correction, mode)
+        result_correction.append(abs(mean_correction - rotate_angle))
         print("Correction: {0:6.3f} in {1:.3f}".format(mean_correction, time))
 
-    plot_result(result)
+    if mode == "SIFT":
+        sift_result_p = result_perspective
+        sift_result_c = result_correction
+    elif mode == "SURF":
+        surf_result_p = result_perspective
+        surf_result_c = result_correction
+    else:
+        orb_result_p = result_perspective
+        orb_result_c = result_correction
+
+plot_double_result(sift_result_p, sift_result_c)
+plot_double_result(surf_result_p, surf_result_c)
+plot_double_result(orb_result_p, orb_result_c)
+

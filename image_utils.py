@@ -160,3 +160,19 @@ def plot_result(y, constant = None):
         plt.plot(x, 0 * x + constant)
     plt.plot(x, y)
     plt.show()
+
+def plot_double_result(y1, y2, constant=None):
+    x1 = np.arange(0, len(y1))
+    y1 = np.array(y1)
+    x2 = np.arange(0, len(y2))
+    y2 = np.array(y2)
+    plt.figure()
+    plt.subplot(2, 1, 1)
+    if constant is not None:
+        plt.plot(x1, 0 * x1 + constant)
+    plt.plot(x1, y1)
+    plt.subplot(2, 1, 2)
+    if constant is not None:
+        plt.plot(x2, 0 * x2 + constant)
+    plt.plot(x2, y2)
+    plt.show()
