@@ -143,11 +143,11 @@ def angleCal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     return mean, end_time
 
 def plot_result_bar(name_result, result, base_value = None):
-    plt.figure()
+    plt.figure(figsize=(12.8, 9.6))
     plt.bar(name_result, result, width=0.25)
     if base_value is not None:
         plt.plot(name_result, len(name_result) * [base_value], 'r--', linewidth=0.5)
-        plt.title("Result" + str(base_value))
+        plt.title("Result in angle " + str(base_value))
     for x, y in zip(name_result, result):
         plt.text(x, y, '%.2f' % y, ha='center', va='bottom')
     plt.show()
