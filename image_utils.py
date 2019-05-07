@@ -70,8 +70,7 @@ def create_images(angle, SHOW_IMAGE = False):
     return result_orig, result_rotate, result_rotate_translation,\
            result_perspective, result_correction
 
-
-def angleCal(img_base, img_rotate, mode = "SURF", show_all_results = False):
+def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     start = time.time()
 
     if mode == "SIFT":
@@ -112,8 +111,8 @@ def angleCal(img_base, img_rotate, mode = "SURF", show_all_results = False):
 
     # Cal the Orientation
     rotate_angle = []
-    num_keypoint = 10
-    for i in range(num_keypoint):
+    key_point = 10
+    for i in range(key_point):
         num = i
         img_index1 = matches[num].queryIdx
         img_index2 = matches[num].trainIdx
@@ -131,7 +130,7 @@ def angleCal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     # Change the local
     rotate_angle = np.array(rotate_angle)
     rotate_angle = (360 * (rotate_angle < 0) + rotate_angle)
-    rotate_angle = np.abs((rotate_angle > 358) * 360 - rotate_angle)
+    rotate_angle = np.abs((rotate_angle > 180) * 360 - rotate_angle)
     mean = np.mean(rotate_angle)
 
     if show_all_results:
@@ -167,12 +166,16 @@ def plot_double_result(y1, y2, constant=None):
     x2 = np.arange(0, len(y2))
     y2 = np.array(y2)
     plt.figure()
-    plt.subplot(2, 1, 1)
+    plt.subplot(3, 1, 1)
     if constant is not None:
         plt.plot(x1, 0 * x1 + constant)
     plt.plot(x1, y1)
-    plt.subplot(2, 1, 2)
+    plt.subplot(3, 1, 2)
     if constant is not None:
         plt.plot(x2, 0 * x2 + constant)
     plt.plot(x2, y2)
+    plt.subplot(3, 1, 3)
+    if constant is not None:
+        plt.plot(x1, 0 * x1 + constant)
+    plt.plot(x1, y1, y2)
     plt.show()
