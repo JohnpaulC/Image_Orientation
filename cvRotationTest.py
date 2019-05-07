@@ -2,22 +2,16 @@ from image_utils import angleCal, create_images, plot_result_bar
 
 rotate_angle = 10
 angles = [5, 8, 10, 20, 30]
-mode = "SIFT"
+mode_list = ["SIFT", "SURF", "ORB"]
 
 for rotate_angle in angles:
     result_orig, result_rotate, result_rotate_translation, \
-    result_perspective, result_correction = create_images(rotate_angle)
+    result_perspective, result_correction = create_images(rotate_angle, SHOW_IMAGE= True)
     print("-" * 10 + str(rotate_angle) + "-" * 10)
     name_result = []
     result = []
     # For Different Feature Descriptor
-    for i in range(3):
-        if i == 0:
-            mode = "SIFT"
-        elif i == 1:
-            mode = "SURF"
-        else:
-            mode = "ORB"
+    for mode in mode_list:
         print("-----The Descriptor {0:s} is using-----".format(mode))
         # Rotate
         mean_rotate, time = angleCal(result_orig, result_rotate, mode)

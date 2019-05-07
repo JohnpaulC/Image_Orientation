@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 print(cv.__version__)
 
 
-def create_images(angle):
+def create_images(angle, SHOW_IMAGE = False):
     # Change one image and getting from.
     top_x = 100
     top_y = 100
@@ -59,7 +59,7 @@ def create_images(angle):
         cv.waitKey(0)
         cv.destroyAllWindows()
 
-    elif True:
+    elif SHOW_IMAGE:
         plt.subplot(2, 2, 1), plt.axis('off'), plt.imshow(img_gray, cmap='Greys_r'), plt.title("gray image")
         plt.subplot(2, 2, 2), plt.axis('off'), plt.imshow(img_rotate, cmap='Greys_r'), plt.title("rotate image")
 
