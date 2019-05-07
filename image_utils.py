@@ -151,3 +151,12 @@ def plot_result_bar(name_result, result, base_value = None):
     for x, y in zip(name_result, result):
         plt.text(x, y, '%.2f' % y, ha='center', va='bottom')
     plt.show()
+
+def plot_result(y, constant = None):
+    x = np.arange(0, len(y))
+    y = np.array(y)
+    plt.figure()
+    if constant is not  None:
+        plt.plot(x, 0 * x + constant)
+    plt.plot(x, y)
+    plt.show()
