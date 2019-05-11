@@ -3,10 +3,8 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-print(cv.__version__)
 
-
-def create_images(angle, SHOW_IMAGE = False):
+def create_images(angle, show_image = False):
     # Change one image and getting from.
     top_x = 100
     top_y = 100
@@ -48,18 +46,7 @@ def create_images(angle, SHOW_IMAGE = False):
     result_correction = img_correction[top_y:bottom_y, top_x:bottom_x]
 
 
-    # DEBUG: Image show
-    if False:
-        cv.imshow("result_orig", result_orig)
-        cv.imshow("result_rotate", result_rotate)
-        cv.imshow("result_rotate_translation", result_rotate_translation)
-        cv.imshow("result_perspective", result_perspective)
-        cv.imshow("result_correction", result_correction)
-
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-
-    elif SHOW_IMAGE:
+    if show_image:
         plt.subplot(2, 2, 1), plt.axis('off'), plt.imshow(img_gray, cmap='Greys_r'), plt.title("gray image")
         plt.subplot(2, 2, 2), plt.axis('off'), plt.imshow(img_rotate, cmap='Greys_r'), plt.title("rotate image")
 
@@ -101,7 +88,7 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     matches = bf.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
 
-    if show_all_results:
+    if False:
         img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:10], None, flags=2)
         cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
         if False:
@@ -136,8 +123,6 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     if show_all_results:
         print("Final result: ")
         print(rotate_angle)
-        print("Mean result: ")
-        print(mean)
 
     return mean, end_time
 
