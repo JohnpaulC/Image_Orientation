@@ -6,7 +6,7 @@ mode_list = ["SIFT", "SURF", "ORB"]
 
 for rotate_angle in angles:
     result_orig, result_rotate, result_rotate_translation, \
-    result_perspective, result_correction = create_images(rotate_angle, SHOW_IMAGE= True)
+    result_perspective, result_correction = create_images(rotate_angle, show_image = True)
     print("-" * 10 + str(rotate_angle) + "-" * 10)
     name_result = []
     result = []
