@@ -88,7 +88,7 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     matches = bf.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
 
-    if False:
+    if True:
         img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:10], None, flags=2)
         cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
         if False:
@@ -98,7 +98,7 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
 
     # Cal the Orientation
     rotate_angle = []
-    key_point = 10
+    key_point = 15
     for i in range(key_point):
         num = i
         img_index1 = matches[num].queryIdx
@@ -123,6 +123,7 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     if show_all_results:
         print("Final result: ")
         print(rotate_angle)
+        plot_result_bar(range(len(rotate_angle)), rotate_angle, mean)
 
     return mean, end_time
 
@@ -134,7 +135,7 @@ def plot_result_bar(name_result, result, base_value = None):
         plt.title("Result in angle " + str(base_value))
     for x, y in zip(name_result, result):
         plt.text(x, y, '%.2f' % y, ha='center', va='bottom')
-    plt.show()
+    plt.savefig("result/" + str(base_value))
 
 def plot_result(y, constant = None):
     x = np.arange(0, len(y))
