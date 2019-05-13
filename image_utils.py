@@ -11,7 +11,7 @@ def create_images(angle, show_image = False):
     bottom_x = 500
     bottom_y = 400
 
-    img_orig = cv.imread('office.jpg', cv.IMREAD_COLOR)
+    img_orig = cv.imread('figures/office.jpg', cv.IMREAD_COLOR)
     (h, w) = img_orig.shape[:2]
     #print("The image size is {0:d} * {1:d}".format(h, w))
     img_gray = cv.cvtColor(img_orig, cv.COLOR_BGR2GRAY)
@@ -91,10 +91,6 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     if True:
         img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:10], None, flags=2)
         cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
-        if False:
-            plt.imshow(img), plt.show()
-            print(type(matches)), print(len(matches))
-            print(type(matches[1]))
 
     # Cal the Orientation
     rotate_angle = []
@@ -104,12 +100,6 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
         img_index1 = matches[num].queryIdx
         img_index2 = matches[num].trainIdx
         rotate_angle.append(kp1[img_index1].angle - kp2[img_index2].angle)
-        if False:
-            print("-" * 20)
-            print(matches[num].distance), print(matches[num].imgIdx)
-            print(matches[num].queryIdx), print(matches[num].trainIdx)
-            print(kp1[img_index1].pt), print(kp1[img_index1].angle)
-            print(kp2[img_index2].pt), print(kp2[img_index2].angle)
 
     end_time = time.time() - start
     #print("Total time: " + str(end_time))
@@ -132,10 +122,11 @@ def plot_result_bar(name_result, result, base_value = None):
     plt.bar(name_result, result, width=0.25)
     if base_value is not None:
         plt.plot(name_result, len(name_result) * [base_value], 'r--', linewidth=0.5)
-        plt.title("Result in angle " + str(base_value))
+    plt.title("Result in angle " + str(base_value))
     for x, y in zip(name_result, result):
         plt.text(x, y, '%.2f' % y, ha='center', va='bottom')
-    plt.savefig("result/" + str(base_value))
+    #plt.show()
+    plt.savefig("results/" + str(base_value) + ".png")
 
 def plot_result(y, constant = None):
     x = np.arange(0, len(y))

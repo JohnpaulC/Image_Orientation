@@ -7,8 +7,8 @@ from image_utils import angle_cal, create_images
 
 np.set_printoptions(suppress=True)
 
-img_base = cv.imread('base.jpg')
-img_rotate = cv.imread('rotate_15.jpg')
+img_base = cv.imread('figures/base.jpg')
+img_rotate = cv.imread('figures/rotate_15.jpg')
 img_base = cv.cvtColor(img_base, cv.COLOR_BGR2GRAY)
 img_rotate = cv.cvtColor(img_rotate, cv.COLOR_BGR2GRAY)
 if False:
