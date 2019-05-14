@@ -87,14 +87,13 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
         bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
     matches = bf.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
-
-    if True:
-        img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:30], None, flags=2)
-        cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
-
     # Cal the Orientation
     rotate_angle = []
     key_point = 25
+    # Show the debug file
+    if True:
+        img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:key_point], None, flags=2)
+        cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
     for i in range(key_point):
         num = i
         img_index1 = matches[num].queryIdx
