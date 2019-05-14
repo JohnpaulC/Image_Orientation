@@ -19,7 +19,7 @@ if False:
     plt.subplot(2,1,2), plt.imshow(img_rotate, "Greys_r")
     plt.show()
 w, h = img_base.shape[:2]
-scale_ratio = 7
+scale_ratio = 2
 img_base = cv.resize(img_base, (int(h/scale_ratio), int(w/scale_ratio)))
 img_rotate = cv.resize(img_rotate, (int(h/scale_ratio), int(w/scale_ratio)))
 if False:
@@ -32,9 +32,9 @@ if False:
 
 
 # Result Calculation
-mean, time = angle_cal(img_base, img_rotate, "SIFT", show_all_results= True)
-print("SIFT Result: {0:6.3f} in {1:.3f}".format(mean, time))
-mean, time = angle_cal(img_base, img_rotate, "SURF", show_all_results= True)
-print("SURF Result: {0:6.3f} in {1:.3f}".format(mean, time))
-mean, time = angle_cal(img_base, img_rotate, "ORB", show_all_results= True)
-print("ORB Result: {0:6.3f} in {1:.3f}".format(mean, time))
+median, mean, time = angle_cal(img_base, img_rotate, "SIFT", show_all_results= 0)
+print("SIFT Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
+median, mean, time = angle_cal(img_base, img_rotate, "SURF", show_all_results= 0)
+print("SURF Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
+median, mean, time = angle_cal(img_base, img_rotate, "ORB", show_all_results= 0)
+print("ORB Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))

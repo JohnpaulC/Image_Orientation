@@ -88,13 +88,13 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     matches = bf.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
 
-    if True:
-        img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:10], None, flags=2)
+    if False:
+        img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:30], None, flags=2)
         cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
 
     # Cal the Orientation
     rotate_angle = []
-    key_point = 15
+    key_point = 25
     for i in range(key_point):
         num = i
         img_index1 = matches[num].queryIdx
@@ -109,13 +109,20 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     rotate_angle = (360 * (rotate_angle < 0) + rotate_angle)
     rotate_angle = np.abs((rotate_angle > 180) * 360 - rotate_angle)
     mean = np.mean(rotate_angle)
+    median =np.median(rotate_angle)
+    print("Before " + str(median))
+    limit = 1
+    median_index = (rotate_angle > max(median - limit, 0)) & (rotate_angle < median + limit)
+    median_index = np.array(median_index + 0)
+    median = np.mean(rotate_angle[np.nonzero(median_index)])
+    print("After " + str(median))
 
     if show_all_results:
         print("Final result: ")
         print(rotate_angle)
         plot_result_bar(range(len(rotate_angle)), rotate_angle, mean)
 
-    return mean, end_time
+    return median, mean, end_time
 
 def plot_result_bar(name_result, result, base_value = None):
     plt.figure(figsize=(12.8, 9.6))
@@ -125,8 +132,8 @@ def plot_result_bar(name_result, result, base_value = None):
     plt.title("Result in angle " + str(base_value))
     for x, y in zip(name_result, result):
         plt.text(x, y, '%.2f' % y, ha='center', va='bottom')
-    #plt.show()
-    plt.savefig("results/" + str(base_value) + ".png")
+    plt.show()
+    #plt.savefig("results/" + str(base_value) + ".png")
 
 def plot_result(y, constant = None):
     x = np.arange(0, len(y))

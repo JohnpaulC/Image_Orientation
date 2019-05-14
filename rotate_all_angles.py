@@ -1,6 +1,6 @@
 from image_utils import angle_cal, create_images, plot_double_result
 
-rotate_angle = 10
+rotate_angle = 15
 mode_list = ["SIFT", "SURF", "ORB"]
 sift_result_p = []
 sift_result_c = []
