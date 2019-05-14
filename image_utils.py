@@ -88,7 +88,7 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     matches = bf.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
 
-    if False:
+    if True:
         img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:30], None, flags=2)
         cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
 
