@@ -8,10 +8,10 @@ from image_utils import angle_cal, create_images
 np.set_printoptions(suppress=True)
 
 img_base = cv.imread('figures/base.jpg')
-img_rotate = cv.imread('figures/rotate_15.jpg')
+img_rotate_orig = cv.imread('figures/rotate_15.jpg')
 img_base = cv.cvtColor(img_base, cv.COLOR_BGR2GRAY)
-img_rotate = cv.cvtColor(img_rotate, cv.COLOR_BGR2GRAY)
-img_rotate = cv.GaussianBlur(img_rotate,(3,3),0)
+img_rotate_orig = cv.cvtColor(img_rotate_orig, cv.COLOR_BGR2GRAY)
+img_rotate = cv.GaussianBlur(img_rotate_orig,(3,3),0)
 
 w, h = img_base.shape[:2]
 rotate_angle = -15
@@ -22,6 +22,18 @@ w, h = img_base.shape[:2]
 center = (h / 2, w / 2)
 M = cv.getRotationMatrix2D(center, rotate_angle, 1)
 img_rotate_base = cv.warpAffine(img_base, M, (h, w))
+
+#hist = cv.calcHist([img_rotate], [0], None, [256], [0,256])
+plt.figure()
+plt.subplot(3,1,1)
+plt.hist(img_rotate_orig.ravel(),256,[0,256])
+plt.subplot(3,1,2)
+plt.hist(img_rotate.ravel(),256,[0,256])
+plt.ylim([0, 50000])
+plt.subplot(3,1,3)
+plt.hist(img_rotate_base.ravel(),256,[0,256])
+plt.show()
+
 if True:
     print("The resize image shape is ")
     print(img_base.shape)

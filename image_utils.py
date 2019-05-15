@@ -59,7 +59,6 @@ def create_images(angle, show_image = False):
 
 def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     start = time.time()
-
     if mode == "SIFT":
         # Sift Create and calculate
         sift = cv.xfeatures2d.SIFT_create()
@@ -93,6 +92,7 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     # Show the debug file
     if True:
         img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:key_point], None, flags=2)
+        cv.imwrite("results/mathing.png", img)
         cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
     for i in range(key_point):
         num = i
@@ -101,13 +101,14 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
         rotate_angle.append(kp1[img_index1].angle - kp2[img_index2].angle)
 
     end_time = time.time() - start
-    #print("Total time: " + str(end_time))
 
     # Change the local
     rotate_angle = np.array(rotate_angle)
     rotate_angle = (360 * (rotate_angle < 0) + rotate_angle)
     rotate_angle = np.abs((rotate_angle > 180) * 360 - rotate_angle)
+    # Mean result
     mean = np.mean(rotate_angle)
+    # Median calculation for the filter the noise
     median =np.median(rotate_angle)
     print("Before " + str(median))
     limit = 1
@@ -123,7 +124,11 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
 
     return median, mean, end_time
 
+
 def plot_result_bar(name_result, result, base_value = None):
+    """
+    This function is ploting the SIFT, SURF, ORB results bar.
+    """
     plt.figure(figsize=(12.8, 9.6))
     plt.bar(name_result, result, width=0.25)
     if base_value is not None:
@@ -135,6 +140,9 @@ def plot_result_bar(name_result, result, base_value = None):
     #plt.savefig("results/" + str(base_value) + ".png")
 
 def plot_result(y, constant = None):
+    """
+    It plot the list result in sequence as polyline.
+    """
     x = np.arange(0, len(y))
     y = np.array(y)
     plt.figure()
@@ -144,6 +152,9 @@ def plot_result(y, constant = None):
     plt.show()
 
 def plot_double_result(y1, y2, constant=None):
+    """
+    It plot the list results in double sequence as polyline.
+    """
     x1 = np.arange(0, len(y1))
     y1 = np.array(y1)
     x2 = np.arange(0, len(y2))
@@ -161,4 +172,12 @@ def plot_double_result(y1, y2, constant=None):
     if constant is not None:
         plt.plot(x1, 0 * x1 + constant)
     plt.plot(x1, y1, y2)
+    plt.show()
+
+def plot_hist(img):
+    color = ('b', 'g', 'r')
+    for i, col in enumerate(color):
+        histr = cv.calcHist([img], [i], None, [256], [0, 256])
+        plt.plot(histr, color=col)
+        plt.xlim([0, 256])
     plt.show()
