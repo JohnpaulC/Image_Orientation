@@ -90,7 +90,7 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_all_results = False):
     rotate_angle = []
     key_point = 25
     # Show the debug file
-    if True:
+    if False:
         img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:key_point], None, flags=2)
         cv.imwrite("results/mathing.png", img)
         cv.imshow('match', img), cv.waitKey(), cv.destroyWindow('match')
