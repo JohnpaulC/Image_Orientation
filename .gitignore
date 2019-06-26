@@ -107,4 +107,12 @@ venv.bak/
 *.ipynb
 *.jpg
 *.png
+cfg/yolov3.pt
+cfg/yolov3.cfg
+results/
+.idea/
+.vscode/
+*.jpg
+*.avi
+*.mp4
 .DS_Store
