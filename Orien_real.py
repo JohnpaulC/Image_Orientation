@@ -7,25 +7,25 @@ from image_utils import angle_cal, create_images
 
 np.set_printoptions(suppress=True)
 
-img_base = cv.imread('figures/0.jpeg')
-img_rotate_orig = cv.imread('figures/10.jpeg')
-img_base = cv.cvtColor(img_base, cv.COLOR_BGR2GRAY)
-img_rotate_orig = cv.cvtColor(img_rotate_orig, cv.COLOR_BGR2GRAY)
-img_rotate = cv.GaussianBlur(img_rotate_orig,(3,3),0)
+img_base = cv2.imread('figures/0.jpeg')
+img_rotate_orig = cv2.imread('figures/10.jpeg')
+img_base = cv2.cvtColor(img_base, cv2.COLOR_BGR2GRAY)
+img_rotate_orig = cv2.cvtColor(img_rotate_orig, cv2.COLOR_BGR2GRAY)
+img_rotate = cv2.GaussianBlur(img_rotate_orig,(3,3),0)
 
 w, h = img_base.shape[:2]
 rotate_angle = -15
 scale_ratio = 5
-img_base = cv.resize(img_base, (int(h/scale_ratio), int(w/scale_ratio)))
-img_rotate = cv.resize(img_rotate, (int(h/scale_ratio), int(w/scale_ratio)))
+img_base = cv2.resize(img_base, (int(h/scale_ratio), int(w/scale_ratio)))
+img_rotate = cv2.resize(img_rotate, (int(h/scale_ratio), int(w/scale_ratio)))
 w, h = img_base.shape[:2]
 center = (h / 2, w / 2)
-M = cv.getRotationMatrix2D(center, rotate_angle, 1)
-img_rotate_base = cv.warpAffine(img_base, M, (h, w))
+M = cv2.getRotationMatrix2D(center, rotate_angle, 1)
+img_rotate_base = cv2.warpAffine(img_base, M, (h, w))
 
 show_hist = False
 if show_hist:
-    #hist = cv.calcHist([img_rotate], [0], None, [256], [0,256])
+    #hist = cv2.calcHist([img_rotate], [0], None, [256], [0,256])
     plt.figure()
     plt.subplot(3,1,1)
     plt.hist(img_rotate_orig.ravel(),256,[0,256])

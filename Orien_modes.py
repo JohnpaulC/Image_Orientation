@@ -1,4 +1,4 @@
-from image_utils import angle_cal, create_images, plot_result_bar
+from Utils_orientation import angle_cal, create_images, plot_result_bar
 
 rotate_angle = 10
 angles = [5, 8, 10, 20, 30]

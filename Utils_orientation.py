@@ -1,4 +1,4 @@
-import cv2 as cv
+import cv2
 import numpy as np
 import time
 import torch
@@ -19,32 +19,32 @@ def create_images(angle, show_image = False):
     bottom_x = 500
     bottom_y = 400
 
-    img_orig = cv.imread('figures/office.jpg', cv.IMREAD_COLOR)
+    img_orig = cv2.imread('figures/office.jpg', cv2.IMREAD_COLOR)
     (h, w) = img_orig.shape[:2]
     #print("The image size is {0:d} * {1:d}".format(h, w))
-    img_gray = cv.cvtColor(img_orig, cv.COLOR_BGR2GRAY)
+    img_gray = cv2.cvtColor(img_orig, cv2.COLOR_BGR2GRAY)
 
     center = (w / 2, h / 2)
-    M = cv.getRotationMatrix2D(center, angle, 1)
-    img_rotate = cv.warpAffine(img_gray, M, (w, h))
+    M = cv2.getRotationMatrix2D(center, angle, 1)
+    img_rotate = cv2.warpAffine(img_gray, M, (w, h))
 
     # Do the translation on rotated image
     x_translation, y_translation = 20, 20
     T = np.float32([
         [1, 0, x_translation],
         [0, 1, y_translation]])
-    img_rotate_translation = cv.warpAffine(img_rotate, T, (w, h))
+    img_rotate_translation = cv2.warpAffine(img_rotate, T, (w, h))
 
 
     ### Do the perspective on Original Image
     num_distortion = 50
     pts1 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
     pts2 = np.float32([[0, num_distortion], [w, 0], [0, h - num_distortion], [w, h]])
-    M_p = cv.getPerspectiveTransform(pts1, pts2)
-    img_perspective = cv.warpPerspective(img_rotate, M_p, (w, h))
+    M_p = cv2.getPerspectiveTransform(pts1, pts2)
+    img_perspective = cv2.warpPerspective(img_rotate, M_p, (w, h))
 
-    M_n = cv.getPerspectiveTransform(pts2, pts1)
-    img_correction = cv.warpPerspective(img_perspective, M_n, (w, h))
+    M_n = cv2.getPerspectiveTransform(pts2, pts1)
+    img_correction = cv2.warpPerspective(img_perspective, M_n, (w, h))
 
     ### Get the slice of whole image
     result_orig = img_gray[top_y:bottom_y, top_x:bottom_x]
@@ -84,29 +84,29 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_results = False, show_im
     # Here the difference mode will using different key points description and matching method
     if mode == "SIFT":
         # Sift Create and calculate
-        sift = cv.xfeatures2d.SIFT_create()
+        sift = cv2.xfeatures2d.SIFT_create()
         # Kp is key points
         # des is feature descriptor
         # len(des) = len(Kp) * 128
         kp1, des1 = sift.detectAndCompute(img_base, None)
         kp2, des2 = sift.detectAndCompute(img_rotate, None)
 
-        bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
+        bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
     elif mode == "ORB":
-        orb = cv.ORB_create()
+        orb = cv2.ORB_create()
 
         kp1, des1 = orb.detectAndCompute(img_base, None)
         kp2, des2 = orb.detectAndCompute(img_rotate, None)
 
         # create BFMatcher object
-        bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
+        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     else:
-        surf = cv.xfeatures2d.SURF_create()
+        surf = cv2.xfeatures2d.SURF_create()
         kp1, des1 = surf.detectAndCompute(img_base, None)
         kp2, des2 = surf.detectAndCompute(img_rotate, None)
 
         # create BFMatcher object
-        bf = cv.BFMatcher(cv.NORM_L2, crossCheck=True)
+        bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
     # Match the key points and sort them by distance
     matches = bf.match(des1, des2)
     matches = sorted(matches, key=lambda x: x.distance)
@@ -136,9 +136,9 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_results = False, show_im
     end_time = time.time() - start
 
     if show_images:
-        img = cv.drawMatches(img_base, kp1, img_rotate, kp2, matches[:key_point], None, flags=2)
-        #cv.imwrite("results/mathing.png", img)
-        cv.imshow('matching images', img), cv.waitKey(), cv.destroyWindow('match')
+        img = cv2.drawMatches(img_base, kp1, img_rotate, kp2, matches[:key_point], None, flags=2)
+        #cv2.imwrite("results/mathing.png", img)
+        cv2.imshow('matching images', img), cv2.waitKey(), cv2.destroyWindow('match')
     if show_results:
         print("Final result: ")
         print(rotate_angle)
@@ -161,7 +161,7 @@ def object_detection(model, img_file):
     conf_thres = 0.5
     nms_thres = 0.5
     # Preprocess the image
-    img0 = cv.imread(img_file)
+    img0 = cv2.imread(img_file)
     # Padded resize
     img, _, _, _ = letterbox(img0)
     # Normalize RGB
@@ -181,11 +181,11 @@ def object_capture(base_file, rotate_file,
                    bool_cap = False, detection_index = 0,
                    detection_base = None, detection_rotate = None):
     if not bool_cap:
-        img_base = cv.imread(base_file)
-        img_rotate = cv.imread(rotate_file)
+        img_base = cv2.imread(base_file)
+        img_rotate = cv2.imread(rotate_file)
     else:
-        img_base = cv.imread(base_file)
-        img_rotate = cv.imread(rotate_file)
+        img_base = cv2.imread(base_file)
+        img_rotate = cv2.imread(rotate_file)
         # Finding the corresponding object
         object_index = np.where(detection_rotate[:, 6] == detection_base[detection_index, 6])
         # Base image capture
@@ -197,69 +197,3 @@ def object_capture(base_file, rotate_file,
 
     return img_base, img_rotate
 
-"""
-Ploting function
-"""
-def plot_result_bar(name_result, result, base_value = None):
-    """
-    This function is ploting the SIFT, SURF, ORB results bar.
-    """
-    plt.figure(figsize=(12.8, 9.6))
-    plt.bar(name_result, result, width=0.25)
-    if base_value is not None:
-        plt.plot(name_result, len(name_result) * [base_value], 'r--', linewidth=0.5)
-    plt.title("Result in angle " + str(base_value))
-    for x, y in zip(name_result, result):
-        plt.text(x, y, '%.2f' % y, ha='center', va='bottom')
-    plt.show()
-    #plt.savefig("results/" + str(base_value) + ".png")
-
-def plot_result(y, constant = None):
-    """
-    It plot the list result in sequence as polyline.
-    """
-    x = np.arange(0, len(y))
-    y = np.array(y)
-    plt.figure()
-    if constant is not  None:
-        plt.plot(x, 0 * x + constant)
-    plt.plot(x, y)
-    plt.show()
-
-def plot_double_result(y1, y2, constant=None):
-    """
-    It plot the list results in double sequence as polyline.
-    """
-    x1 = np.arange(0, len(y1))
-    y1 = np.array(y1)
-    x2 = np.arange(0, len(y2))
-    y2 = np.array(y2)
-    plt.figure()
-    plt.subplot(3, 1, 1)
-    if constant is not None:
-        plt.plot(x1, 0 * x1 + constant)
-    plt.plot(x1, y1)
-    plt.subplot(3, 1, 2)
-    if constant is not None:
-        plt.plot(x2, 0 * x2 + constant)
-    plt.plot(x2, y2)
-    plt.subplot(3, 1, 3)
-    if constant is not None:
-        plt.plot(x1, 0 * x1 + constant)
-    plt.plot(x1, y1, y2)
-    plt.show()
-
-def plot_hist(img):
-    color = ('b', 'g', 'r')
-    for i, col in enumerate(color):
-        histr = cv.calcHist([img], [i], None, [256], [0, 256])
-        plt.plot(histr, color=col)
-        plt.xlim([0, 256])
-    plt.show()
-
-def cv_show_images(img, img_2 = None):
-    cv.imshow("First image", img)
-    if img_2 is not None:
-        cv.imshow("Second image", img)
-    cv.waitKey()
-    cv.destroyAllWindows()

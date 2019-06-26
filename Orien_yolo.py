@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import torch
 
+from utils.datasets import letterbox
 from utils.models import *
 from Utils_orientation import *
 
