@@ -197,3 +197,23 @@ def object_capture(base_file, rotate_file,
 
     return img_base, img_rotate
 
+
+def histogram_gradient(img, img_rotate, mag_thres = 20, bin_num = 360):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img_rotate = cv2.cvtColor(img_rotate, cv2.COLOR_BGR2GRAY)
+
+    for img in [img, img_rotate]:
+        sobelx=cv2.Sobel(img, cv2.CV_64F, dx=1, dy=0)
+        sobely=cv2.Sobel(img, cv2.CV_64F, dx=0, dy=1)
+        gradient = np.arctan2(sobely, sobelx) * 180 / np.pi
+        magnitude = np.sqrt(sobelx ** 2 + sobely ** 2)
+        mag_thres = magnitude.max() / 2
+        gradient = (magnitude > mag_thres) * gradient
+        gradient = (gradient < 0) * 360 + gradient
+        hist, bins = np.histogram(gradient, bin_num)
+        hist = hist[1:]
+        
+        plt.plot(hist)
+    #plt.xlim([1, bin_num])
+    #plt.ylim([0, 15000])
+    plt.show()

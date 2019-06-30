@@ -38,15 +38,19 @@ show_results = False
 show_images = True
 mode = "SIFT"
 # The index of object using to calculation the capture image
-detection_index = 0
+detection_index = 2
 
 if True:
     img_base, img_rotate = object_capture(base_file, rotate_file)
+    histogram_gradient(img_base, img_rotate)
+    #cv2.imwrite('cap.jpg', img_base)
+    #cv2.imwrite('rotate.jpg', img_rotate)
     median, mean, time = angle_cal(img_base, img_rotate, mode, show_results= show_results, show_images= show_images)
     print(mode + "real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
 
 img_base, img_rotate = object_capture(base_file, rotate_file,
                    bool_cap = True, detection_index = detection_index,
                    detection_base = detection_base, detection_rotate = detection_rotate)
+histogram_gradient(img_base, img_rotate)
 median, mean, time = angle_cal(img_base, img_rotate, mode, show_results= show_results, show_images= show_images)
 print(mode + "real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
