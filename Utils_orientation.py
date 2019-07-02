@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from utils.datasets import *
 from utils.utils import *
 
+from Utils_plot import plot_result_bar
+
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 """
@@ -113,8 +115,10 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_results = False, show_im
 
     # Cal the Orientation
     rotate_angle = []
-    key_point = 25
+    key_point = 10
     limit = 2
+
+    key_point = min(key_point, int(len(matches) / 2))
 
     for i in range(key_point):
         num = i
@@ -201,8 +205,9 @@ def object_capture(base_file, rotate_file,
 def histogram_gradient(img, img_rotate, mag_thres = 20, bin_num = 360):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_rotate = cv2.cvtColor(img_rotate, cv2.COLOR_BGR2GRAY)
+    colors = ['r', 'g']
 
-    for img in [img, img_rotate]:
+    for i, img in enumerate([img, img_rotate]):
         sobelx=cv2.Sobel(img, cv2.CV_64F, dx=1, dy=0)
         sobely=cv2.Sobel(img, cv2.CV_64F, dx=0, dy=1)
         gradient = np.arctan2(sobely, sobelx) * 180 / np.pi
@@ -212,8 +217,8 @@ def histogram_gradient(img, img_rotate, mag_thres = 20, bin_num = 360):
         gradient = (gradient < 0) * 360 + gradient
         hist, bins = np.histogram(gradient, bin_num)
         hist = hist[1:]
-        
-        plt.plot(hist)
+        color = colors[i]
+        plt.plot(hist, color= color)
     #plt.xlim([1, bin_num])
     #plt.ylim([0, 15000])
     plt.show()
