@@ -201,7 +201,6 @@ def object_capture(base_file, rotate_file,
 
     return img_base, img_rotate
 
-
 def histogram_gradient(img, img_rotate, mag_thres = 20, bin_num = 360):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_rotate = cv2.cvtColor(img_rotate, cv2.COLOR_BGR2GRAY)
@@ -222,3 +221,24 @@ def histogram_gradient(img, img_rotate, mag_thres = 20, bin_num = 360):
     #plt.xlim([1, bin_num])
     #plt.ylim([0, 15000])
     plt.show()
+
+
+def angle_HoG(base_HoG, rotate_HoG, limits = 10):
+    m, n = base_HoG.shape
+    
+    error = np.array([])
+    for i in range(-limits, limits + 1):
+        base_begin = max(0, i)
+        base_end = min(m, m + i)
+
+        rotate_begin = max(0, -i)
+        rotate_end = min(m, m - i)
+
+        base_line = base_HoG[base_begin:base_end, :]
+        rotate_line = rotate_HoG[rotate_begin:rotate_end, :]
+
+        error = np.append(error, np.mean((base_line - rotate_line) **2))
+
+    angle = np.argmin(error) - limits
+    
+    return angle

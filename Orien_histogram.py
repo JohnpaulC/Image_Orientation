@@ -8,8 +8,8 @@ from utils.models import *
 from Utils_orientation import *
 
 # Image path
-base_file = 'Video/' + str(71) + '.jpg'
-rotate_file = 'Video/' + str(99) + '.jpg'
+base_file = 'figures/' + str(71) + '.jpg'
+rotate_file = 'figures/' + str(99) + '.jpg'
 
 # Configuration file path
 cfg = 'cfg/yolov3.cfg'

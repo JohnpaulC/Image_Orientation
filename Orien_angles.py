@@ -1,5 +1,6 @@
 #from image_utils import angle_cal, create_images, plot_double_result
-from Utils_orientation import angle_cal, create_images, plot_double_result
+from Utils_orientation import angle_cal, create_images
+from Utils_plot import plot_double_result
 
 rotate_angle = 15
 mode_list = ["SIFT", "SURF", "ORB"]
@@ -17,12 +18,12 @@ for mode in mode_list:
         img_orig, _, _, img_perspective, img_correction = create_images(rotate_angle)
         # For Different Feature Descriptor
         # Perspective
-        mean_perspective, time = angle_cal(img_orig, img_perspective, mode)
+        _, mean_perspective, time = angle_cal(img_orig, img_perspective, mode)
         result_perspective.append(abs(mean_perspective - rotate_angle))
         print("Perspective: {0:6.3f} in {1:.3f}".format(mean_perspective, time))
 
         # Correction
-        mean_correction, time = angle_cal(img_orig, img_correction, mode)
+        _, mean_correction, time = angle_cal(img_orig, img_correction, mode)
         result_correction.append(abs(mean_correction - rotate_angle))
         print("Correction: {0:6.3f} in {1:.3f}".format(mean_correction, time))
 
