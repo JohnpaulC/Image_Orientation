@@ -54,7 +54,7 @@ object_num = min(detection_base.shape[0], detection_rotate.shape[0])
 img_base, img_rotate = object_capture(base_file, rotate_file)
 
 start = time.time()
-print(start)
+
 hist_base = HoG_cal(img_base, mag_thres= thres, bin_num= bins)
 hist_rotate = HoG_cal(img_rotate, mag_thres= thres, bin_num= bins)
 

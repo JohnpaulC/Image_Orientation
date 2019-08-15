@@ -1,4 +1,4 @@
-#from image_utils import angle_cal, create_images, plot_double_result
+import matplotlib.pyplot as plt
 from Utils_orientation import angle_cal, create_images
 from Utils_plot import plot_double_result
 
@@ -37,7 +37,22 @@ for mode in mode_list:
         orb_result_p = result_perspective
         orb_result_c = result_correction
 
-plot_double_result(sift_result_p, sift_result_c)
-plot_double_result(surf_result_p, surf_result_c)
-plot_double_result(orb_result_p, orb_result_c)
+if False:
+    plot_double_result(sift_result_p, sift_result_c)
+    plot_double_result(surf_result_p, surf_result_c)
+    plot_double_result(orb_result_p, orb_result_c)
+else:
+    plt.subplot(3, 1, 1)
+    plt.plot(sift_result_p, 'r')
+    plt.plot(sift_result_c, 'g')
 
+    plt.subplot(3, 1, 2)
+    plt.plot(surf_result_p, 'r')
+    plt.plot(surf_result_c, 'g')
+
+    plt.subplot(3, 1, 3)
+    plt.plot(orb_result_p, 'r')
+    plt.plot(orb_result_c, 'g')
+    plt.show()
+
+    

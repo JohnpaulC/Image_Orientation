@@ -202,7 +202,8 @@ def object_capture(base_file, rotate_file,
     return img_base, img_rotate
 
 def HoG_cal(img, mag_thres = 50, bin_num = 360):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    if len(img.shape) == 3:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Cal the magnitude and angle of Gradients
     sobelx=cv2.Sobel(img, cv2.CV_64F, dx=1, dy=0)
