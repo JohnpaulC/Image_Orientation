@@ -34,8 +34,8 @@ else:
     detection_rotate = object_detection(model, rotate_file).cpu().numpy()
     
 # Image Orientation Calculation
-show_results = True
-show_images = True
+show_results = False
+show_images = False
 mode = "SIFT"
 # The index of object using to calculation the capture image
 detection_index = 2
@@ -51,13 +51,28 @@ object_num = min(detection_base.shape[0], detection_rotate.shape[0])
 img_base, img_rotate = object_capture(base_file, rotate_file)
 histogram_gradient(img_base, img_rotate, mag_thres= 80, bin_num= 360)
 median, mean, time = angle_cal(img_base, img_rotate, mode, show_results= show_results, show_images= show_images)
-print(mode + "real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
+print(mode + " real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
 
-
+bins = 360
+thres = 50
+colors = ['r', 'g']
 for detection_index in range(object_num):
     img_base, img_rotate = object_capture(base_file, rotate_file,
                        bool_cap = True, detection_index = detection_index,
                        detection_base = detection_base, detection_rotate = detection_rotate)
-    histogram_gradient(img_base, img_rotate, mag_thres= 50, bin_num= 360)
+
+    hist_base = HoG_cal(img_base, mag_thres= thres, bin_num= bins)
+    hist_rotate = HoG_cal(img_rotate, mag_thres= thres, bin_num= bins)
+    #histogram_gradient(img_base, img_rotate, mag_thres= 50, bin_num= 360)
+    
+    # Using HoG to calculate the angel
+    angle = angle_HoG(hist_base, hist_rotate, limits = 10)
+    print("The HoG result is " + str(angle))
+
+    # Using Feature descriptor
     median, mean, time = angle_cal(img_base, img_rotate, mode, show_results= show_results, show_images= show_images)
-    print(mode + "real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
+    print(mode + " real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
+
+    #plt.plot(hist_base, 'r')
+    #plt.plot(hist_rotate, 'g')
+    #plt.show()

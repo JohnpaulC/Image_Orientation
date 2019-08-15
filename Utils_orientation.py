@@ -222,9 +222,27 @@ def histogram_gradient(img, img_rotate, mag_thres = 20, bin_num = 360):
     #plt.ylim([0, 15000])
     plt.show()
 
+def HoG_cal(img, mag_thres = 50, bin_num = 360):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Cal the magnitude and angle of Gradients
+    sobelx=cv2.Sobel(img, cv2.CV_64F, dx=1, dy=0)
+    sobely=cv2.Sobel(img, cv2.CV_64F, dx=0, dy=1)
+    gradient = np.arctan2(sobely, sobelx) * 180 / np.pi
+    magnitude = np.sqrt(sobelx ** 2 + sobely ** 2)
+
+    # Set one Threshold which discard the low identity gradient
+    #mag_thres = magnitude.max() / 2
+    gradient = (magnitude > mag_thres) * gradient
+    gradient = (gradient < 0) * 360 + gradient
+    hist, bins = np.histogram(gradient, bin_num)
+    hist = hist[1:]
+    
+    return hist
+
 
 def angle_HoG(base_HoG, rotate_HoG, limits = 10):
-    m, n = base_HoG.shape
+    m = base_HoG.shape[0]
     
     error = np.array([])
     for i in range(-limits, limits + 1):
@@ -234,8 +252,8 @@ def angle_HoG(base_HoG, rotate_HoG, limits = 10):
         rotate_begin = max(0, -i)
         rotate_end = min(m, m - i)
 
-        base_line = base_HoG[base_begin:base_end, :]
-        rotate_line = rotate_HoG[rotate_begin:rotate_end, :]
+        base_line = base_HoG[base_begin:base_end]
+        rotate_line = rotate_HoG[rotate_begin:rotate_end]
 
         error = np.append(error, np.mean((base_line - rotate_line) **2))
 
