@@ -33,45 +33,52 @@ else:
     detection_base = object_detection(model, base_file).cpu().numpy()
     detection_rotate = object_detection(model, rotate_file).cpu().numpy()
     
+
+######
 # Image Orientation Calculation
+######
 show_results = False
 show_images = False
 mode = "SIFT"
 # The index of object using to calculation the capture image
 detection_index = 2
+# The HoG parameters
+bins = 360
+thres = 50
 
-print(detection_base)
 print(detection_base.shape)
-print(detection_rotate)
 print(detection_rotate.shape)
 
 object_num = min(detection_base.shape[0], detection_rotate.shape[0])
 
-
 img_base, img_rotate = object_capture(base_file, rotate_file)
-histogram_gradient(img_base, img_rotate, mag_thres= 80, bin_num= 360)
-median, mean, time = angle_cal(img_base, img_rotate, mode, show_results= show_results, show_images= show_images)
-print(mode + " real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
 
-bins = 360
-thres = 50
-colors = ['r', 'g']
+start = time.time()
+print(start)
+hist_base = HoG_cal(img_base, mag_thres= thres, bin_num= bins)
+hist_rotate = HoG_cal(img_rotate, mag_thres= thres, bin_num= bins)
+
+# Using HoG to calculate the angel
+angle = angle_HoG(hist_base, hist_rotate, limits = 10)
+print("The HoG result is {0:2d} in {1:.4f}".format(angle, time.time() - start))
+median, mean, t = angle_cal(img_base, img_rotate, mode, show_results= show_results, show_images= show_images)
+print(mode + " real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.4f}".format(median, mean, t))
+
 for detection_index in range(object_num):
     img_base, img_rotate = object_capture(base_file, rotate_file,
                        bool_cap = True, detection_index = detection_index,
                        detection_base = detection_base, detection_rotate = detection_rotate)
-
+    start = time.time()
     hist_base = HoG_cal(img_base, mag_thres= thres, bin_num= bins)
     hist_rotate = HoG_cal(img_rotate, mag_thres= thres, bin_num= bins)
-    #histogram_gradient(img_base, img_rotate, mag_thres= 50, bin_num= 360)
     
     # Using HoG to calculate the angel
     angle = angle_HoG(hist_base, hist_rotate, limits = 10)
-    print("The HoG result is " + str(angle))
+    print("The HoG result is {0:2d} in {1:.4f}".format(angle, time.time() - start))
 
     # Using Feature descriptor
-    median, mean, time = angle_cal(img_base, img_rotate, mode, show_results= show_results, show_images= show_images)
-    print(mode + " real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.3f}".format(median, mean, time))
+    median, mean, t = angle_cal(img_base, img_rotate, mode, show_results= show_results, show_images= show_images)
+    print(mode + " real Result: median({0:6.3f}), mean({1:6.3f}) in {2:.4f}".format(median, mean, t))
 
     #plt.plot(hist_base, 'r')
     #plt.plot(hist_rotate, 'g')
