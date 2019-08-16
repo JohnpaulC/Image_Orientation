@@ -18,7 +18,7 @@ weights = 'cfg/yolov3.pt'
 
 # Model parameter
 img_size=416
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 
 # Initialize model and load weights
 model = Darknet(cfg, img_size)

@@ -3,7 +3,7 @@ from Utils_orientation import angle_cal, create_images
 from Utils_plot import plot_double_result
 
 rotate_angle = 15
-mode_list = ["SIFT", "SURF", "ORB"]
+mode_list = ["SIFT", "ORB"]
 sift_result_p = []
 sift_result_c = []
 surf_result_p = []
@@ -14,7 +14,7 @@ orb_result_c = []
 for mode in mode_list:
     result_perspective = []
     result_correction = []
-    for rotate_angle in range(45):
+    for rotate_angle in range(30):
         img_orig, _, _, img_perspective, img_correction = create_images(rotate_angle)
         # For Different Feature Descriptor
         # Perspective
@@ -42,17 +42,31 @@ if False:
     plot_double_result(surf_result_p, surf_result_c)
     plot_double_result(orb_result_p, orb_result_c)
 else:
-    plt.subplot(3, 1, 1)
-    plt.plot(sift_result_p, 'r')
-    plt.plot(sift_result_c, 'g')
+    plt.subplot(2, 1, 1)
+    plt.plot(sift_result_p, 'r', label = 'Perspective')
+    plt.plot(sift_result_c, 'g', label = 'Correction')
+    plt.legend()
+    plt.title('The error using SIFT matching', loc = 'left')
 
-    plt.subplot(3, 1, 2)
-    plt.plot(surf_result_p, 'r')
-    plt.plot(surf_result_c, 'g')
+    # plt.subplot(3, 1, 2)
+    # plt.plot(surf_result_p, 'r', label = 'Perspective')
+    # plt.plot(surf_result_c, 'g', label = 'Correction')
+    # plt.legend()
+    # plt.title('The error using SURF matching', loc = 'left')
 
-    plt.subplot(3, 1, 3)
-    plt.plot(orb_result_p, 'r')
-    plt.plot(orb_result_c, 'g')
+    plt.subplot(2, 1, 2)
+    plt.plot(orb_result_p, 'r', label = 'Perspective')
+    plt.plot(orb_result_c, 'g', label = 'Correction')
+    plt.legend()
+    plt.title('The error using ORB matching', loc = 'left')
+    plt.show()
+
+
+    plt.plot(sift_result_c, label = 'SIFT')
+    plt.plot(orb_result_c, label = 'ORB')
+    plt.legend()
+    plt.title('The errors between SIFT and ORB')
+    plt.ylim((0, 1))
     plt.show()
 
     
