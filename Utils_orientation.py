@@ -11,9 +11,6 @@ from Utils_plot import plot_result_bar
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-"""
-Utils function
-"""
 def create_images(angle, show_image = False):
     # Change one image and getting from.
     top_x = 100
@@ -67,7 +64,7 @@ def create_images(angle, show_image = False):
     return result_orig, result_rotate, result_rotate_translation,\
            result_perspective, result_correction
 
-def angle_cal(img_base, img_rotate, mode = "SURF", show_results = False, show_images = False):
+def angle_cal(img_base, img_rotate, mode = "SIFT", show_results = False, show_images = False):
     """
         This is a Orietation calculation function using Descriptor SIFT, SURF or ORB.
 
@@ -83,6 +80,28 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_results = False, show_im
             time: Processing of whole process
         """
     start = time.time()
+    
+    rotate_angle = match_angels(img_base, img_rotate, mode= mode, show_images= show_images)
+
+    # Mean result
+    mean = np.mean(rotate_angle)
+
+    limit = 2
+    # Median calculation for the filter the noise
+    median =np.median(rotate_angle)
+    median_index = (rotate_angle > max(median - limit, 0)) & (rotate_angle < median + limit)
+    median_index = np.array(median_index + 0)
+    median = np.mean(rotate_angle[np.nonzero(median_index)])
+    end_time = time.time() - start
+
+    
+    if show_results:
+        plot_result_bar(range(len(rotate_angle)), rotate_angle, mean)
+        print("Final result: " + str(rotate_angle))
+
+    return median, mean, end_time
+
+def match_angels(img_base, img_rotate, mode = "SIFT", show_images = False):
     # Here the difference mode will using different key points description and matching method
     if mode == "SIFT":
         # Sift Create and calculate
@@ -115,8 +134,7 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_results = False, show_im
 
     # Cal the Orientation
     rotate_angle = []
-    key_point = 20
-    limit = 2
+    key_point = 15
 
     key_point = min(key_point, int(len(matches) / 2))
 
@@ -126,29 +144,17 @@ def angle_cal(img_base, img_rotate, mode = "SURF", show_results = False, show_im
         img_index2 = matches[num].trainIdx
         rotate_angle.append(kp1[img_index1].angle - kp2[img_index2].angle)
 
-    # Change the results into 0~180
-    rotate_angle = np.array(rotate_angle)
-    rotate_angle = (360 * (rotate_angle < 0) + rotate_angle)
-    rotate_angle = np.abs((rotate_angle > 180) * 360 - rotate_angle)
-    # Mean result
-    mean = np.mean(rotate_angle)
-    # Median calculation for the filter the noise
-    median =np.median(rotate_angle)
-    median_index = (rotate_angle > max(median - limit, 0)) & (rotate_angle < median + limit)
-    median_index = np.array(median_index + 0)
-    median = np.mean(rotate_angle[np.nonzero(median_index)])
-    end_time = time.time() - start
-
     if show_images:
         img = cv2.drawMatches(img_base, kp1, img_rotate, kp2, matches[:key_point], None, flags=2)
         #cv2.imwrite("results/mathing.png", img)
         cv2.imshow('matching images', img), cv2.waitKey(), cv2.destroyWindow('match')
-    if show_results:
-        print("Final result: ")
-        print(rotate_angle)
-        plot_result_bar(range(len(rotate_angle)), rotate_angle, mean)
+    
+    # Change the results into 0~180
+    rotate_angle = np.array(rotate_angle)
+    rotate_angle = (360 * (rotate_angle < 0) + rotate_angle)
+    rotate_angle = np.abs((rotate_angle > 180) * 360 - rotate_angle)
 
-    return median, mean, end_time
+    return rotate_angle
 
 def object_detection(model, img_file):
     """
@@ -202,6 +208,9 @@ def object_capture(base_file, rotate_file,
     return img_base, img_rotate
 
 def HoG_cal(img, mag_thres = 50, bin_num = 360):
+    '''
+    Calculation the histogram of gradients direction
+    '''
     if len(img.shape) == 3:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -220,8 +229,10 @@ def HoG_cal(img, mag_thres = 50, bin_num = 360):
     
     return hist
 
-
 def angle_HoG(base_HoG, rotate_HoG, limits = 10):
+    '''
+    Calculation the translation value of two hists
+    '''
     m = base_HoG.shape[0]
     
     error = np.array([])
