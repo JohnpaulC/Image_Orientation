@@ -173,7 +173,7 @@ def object_detection(model, img_file):
     # Preprocess the image
     img0 = cv2.imread(img_file)
     # Padded resize
-    img, _, _, _ = letterbox(img0)
+    img, _, _, _, _ = letterbox(img0)
     # Normalize RGB
     img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB
     img = np.ascontiguousarray(img, dtype=np.float32)  # uint8 to float32
@@ -182,9 +182,11 @@ def object_detection(model, img_file):
     img = torch.from_numpy(img).unsqueeze(0).to(device)
     with torch.no_grad():
         pred, _ = model(img)
+    # NMS 
     detections = non_max_suppression(pred, conf_thres, nms_thres)[0]
+
     # Rescale the detection into original size
-    scale_coords(416, detections[:, :4], img0.shape).round()
+    scale_coords(img.shape[2:], detections[:, :4], img0.shape).round()
     return detections
 
 def object_capture(base_file, rotate_file,

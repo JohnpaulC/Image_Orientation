@@ -106,11 +106,11 @@ venv.bak/
 .idea/inspectionProfiles/profiles_settings.xml
 *.jpg
 *.png
-cfg/yolov3.pt
-cfg/yolov3.cfg
+cfg/best.pt
 results/
 .idea/
 .vscode/
+old/
 *.jpg
 *.avi
 *.mp4
