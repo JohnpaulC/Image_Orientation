@@ -12,8 +12,11 @@ def plot_result_bar(name_result, result, base_value = None):
     plt.figure(figsize=(12.8, 9.6))
     plt.bar(name_result, result, width=0.25)
     if base_value is not None:
-        plt.plot(name_result, len(name_result) * [base_value], 'r--', linewidth=0.5)
-    plt.title("Result in angle " + str(base_value))
+        plt.plot(name_result, len(name_result) * [base_value], 'r--', linewidth=1)
+    #plt.title("Average orientation estimation in {0:.3f} ".format(base_value), fontsize = 16)
+    plt.title("The Results of Orientation", fontsize = 20)
+    plt.xlabel('Index of keypoint', fontsize = 20)
+    plt.ylabel('Orientation estimation', fontsize = 20)
     for x, y in zip(name_result, result):
         plt.text(x, y, '%.2f' % y, ha='center', va='bottom')
     plt.show()
