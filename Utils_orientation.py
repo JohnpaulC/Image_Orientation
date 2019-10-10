@@ -9,7 +9,7 @@ from utils.utils import *
 
 from Utils_plot import plot_result_bar
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 
 def create_images(angle, show_image = False):
     # Change one image and getting from.
@@ -171,6 +171,8 @@ def object_detection(model, img_file):
     conf_thres = 0.5
     nms_thres = 0.5
     # Preprocess the image
+
+    start_time = time.time()
     img0 = cv2.imread(img_file)
     # Padded resize
     img, _, _, _, _ = letterbox(img0)
@@ -178,15 +180,21 @@ def object_detection(model, img_file):
     img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB
     img = np.ascontiguousarray(img, dtype=np.float32)  # uint8 to float32
     img /= 255.0  # 0 - 255 to 0.0 - 1.0
+
+    imgpreprocess_time = time.time() - start_time
     # Get detections
     img = torch.from_numpy(img).unsqueeze(0).to(device)
     with torch.no_grad():
         pred, _ = model(img)
     # NMS 
     detections = non_max_suppression(pred, conf_thres, nms_thres)[0]
-
+    detection_time = time.time() - start_time - imgpreprocess_time
     # Rescale the detection into original size
     scale_coords(img.shape[2:], detections[:, :4], img0.shape).round()
+    reject_time = time.time() - start_time  - imgpreprocess_time - detection_time
+
+    print("The whole process: {0:.4f} = {1:.4f} + {2:.4f} + {3:.4f}"\
+          .format(time.time() - start_time, imgpreprocess_time, detection_time, reject_time))
     return detections
 
 def object_capture(base_file, rotate_file,

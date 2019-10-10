@@ -104,10 +104,9 @@ venv.bak/
 .mypy_cache/
 .idea/
 .idea/inspectionProfiles/profiles_settings.xml
-*.jpg
-*.png
 cfg/best.pt
 results/
+figures/
 .idea/
 .vscode/
 old/
