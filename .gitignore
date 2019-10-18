@@ -105,6 +105,7 @@ venv.bak/
 .idea/
 .idea/inspectionProfiles/profiles_settings.xml
 cfg/best.pt
+cfg/yolov3-spp.pt
 results/
 figures/
 .idea/

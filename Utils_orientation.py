@@ -81,7 +81,7 @@ def angle_cal(img_base, img_rotate, mode = "SIFT", show_results = False, show_im
         """
     start = time.time()
     
-    rotate_angle = match_angels(img_base, img_rotate, mode= mode, show_images= show_images)
+    rotate_angle = match_angles(img_base, img_rotate, mode= mode, show_images= show_images)
 
     # Mean result
     mean = np.mean(rotate_angle)
@@ -101,7 +101,7 @@ def angle_cal(img_base, img_rotate, mode = "SIFT", show_results = False, show_im
 
     return median, mean, end_time
 
-def match_angels(img_base, img_rotate, mode = "SIFT", show_images = False):
+def match_angles(img_base, img_rotate, mode = "SIFT", show_images = False):
     # Here the difference mode will using different key points description and matching method
     if mode == "SIFT":
         # Sift Create and calculate
